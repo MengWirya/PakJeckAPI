@@ -48,22 +48,22 @@ app.useGlobalPipes(
 );
 ```
 
-| Option | Why it matters |
-| --- | --- |
-| `whitelist` | Strip properties that are not declared on the DTO |
-| `forbidNonWhitelisted` | Reject unexpected fields instead of silently ignoring them |
-| `transform` | Turn plain JSON / query strings into class instances |
-| `enableImplicitConversion` | Convert `"12"` from params/query into a number when the DTO field is typed as `number` |
+| Option                       | Why it matters                                                                            |
+| ---------------------------- | ----------------------------------------------------------------------------------------- |
+| `whitelist`                | Strip properties that are not declared on the DTO                                         |
+| `forbidNonWhitelisted`     | Reject unexpected fields instead of silently ignoring them                                |
+| `transform`                | Turn plain JSON / query strings into class instances                                      |
+| `enableImplicitConversion` | Convert`"12"` from params/query into a number when the DTO field is typed as `number` |
 
 Create one DTO class per request source when a case uses more than one source (`ParamsDto`, `QueryDto`, `BodyDto`). Do not mix params, query, and body into a single class.
 
 ## When to use params, query, or body
 
-| Source | Decorator | Use it for | Do not use it for |
-| --- | --- | --- | --- |
-| **Params** | `@Param()` | A required value that belongs in the URL (`/convert/length/1500`, `/parking/3`) | Optional filters or a long list of fields |
-| **Query** | `@Query()` | Optional settings and flags (`?rate=11&inclusive=false`) | A large payload such as a list of items |
-| **Body** | `@Body()` | Data the client submits, especially objects and arrays (`scores`, `items`) | A single identifier that already fits the URL |
+| Source           | Decorator    | Use it for                                                                          | Do not use it for                             |
+| ---------------- | ------------ | ----------------------------------------------------------------------------------- | --------------------------------------------- |
+| **Params** | `@Param()` | A required value that belongs in the URL (`/convert/length/1500`, `/parking/3`) | Optional filters or a long list of fields     |
+| **Query**  | `@Query()` | Optional settings and flags (`?rate=11&inclusive=false`)                          | A large payload such as a list of items       |
+| **Body**   | `@Body()`  | Data the client submits, especially objects and arrays (`scores`, `items`)      | A single identifier that already fits the URL |
 
 Quick rule: **params identify the main value**, **query adjusts the calculation**, **body carries the payload**.
 
@@ -124,17 +124,17 @@ Each case is an **independent daily-life problem**. They do not share data or mo
 
 **What to learn:** a path param is the main value. Transform a string param into a number and reject invalid values.
 
-| | |
-| --- | --- |
-| Method | `GET` |
+|          |                             |
+| -------- | --------------------------- |
+| Method   | `GET`                     |
 | Endpoint | `/convert/length/:meters` |
-| Input | **Params only** |
+| Input    | **Params only**       |
 
 **Params DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `meters` | `number` | required, number, minimum `0`, max `1_000_000` |
+| Field      | Type       | Rules                                             |
+| ---------- | ---------- | ------------------------------------------------- |
+| `meters` | `number` | required, number, minimum`0`, max `1_000_000` |
 
 **Example request**
 
@@ -165,19 +165,19 @@ Round `miles` to 3 decimal places. Invalid example: `GET /convert/length/abc` or
 
 **What to learn:** query strings are for calculation options. Query values arrive as strings, so they must be transformed (`"11"` → `11`, `"false"` → `false`).
 
-| | |
-| --- | --- |
-| Method | `GET` |
-| Endpoint | `/tax` |
-| Input | **Query only** |
+|          |                      |
+| -------- | -------------------- |
+| Method   | `GET`              |
+| Endpoint | `/tax`             |
+| Input    | **Query only** |
 
 **Query DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `amount` | `number` | required, number, minimum `0` |
-| `rate` | `number` | required, number, `0`–`100` |
-| `inclusive` | `boolean` | optional, default `false`. If `true`, `amount` already includes tax |
+| Field         | Type        | Rules                                                                    |
+| ------------- | ----------- | ------------------------------------------------------------------------ |
+| `amount`    | `number`  | required, number, minimum`0`                                           |
+| `rate`      | `number`  | required, number,`0`–`100`                                          |
+| `inclusive` | `boolean` | optional, default`false`. If `true`, `amount` already includes tax |
 
 **Example request**
 
@@ -210,18 +210,18 @@ When `inclusive=true`, `gross` equals `amount`, `tax = amount * rate / (100 + ra
 
 **What to learn:** a list of values belongs in the body. Validate an array with `@IsArray()`, `@ArrayMinSize()`, and `@IsNumber({}, { each: true })`.
 
-| | |
-| --- | --- |
-| Method | `POST` |
+|          |                     |
+| -------- | ------------------- |
+| Method   | `POST`            |
 | Endpoint | `/scores/average` |
-| Input | **Body only** |
+| Input    | **Body only** |
 
 **Body DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `scores` | `number[]` | required, `1`–`20` items, each number `0`–`100` |
-| `passMark` | `number` | optional, number, `0`–`100`, default `70` |
+| Field        | Type         | Rules                                                    |
+| ------------ | ------------ | -------------------------------------------------------- |
+| `scores`   | `number[]` | required,`1`–`20` items, each number `0`–`100` |
+| `passMark` | `number`   | optional, number,`0`–`100`, default `70`          |
 
 **Example request**
 
@@ -261,27 +261,27 @@ Round `average` to 1 decimal place.
 
 **What to learn:** the URL holds how many people pay. The body holds the food items. Validate a nested array of objects.
 
-| | |
-| --- | --- |
-| Method | `POST` |
+|          |                               |
+| -------- | ----------------------------- |
+| Method   | `POST`                      |
 | Endpoint | `/bills/:peopleCount/split` |
-| Input | **Params + Body** |
+| Input    | **Params + Body**       |
 
 **Params DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `peopleCount` | `number` | required, integer, `2`–`20` |
+| Field           | Type       | Rules                           |
+| --------------- | ---------- | ------------------------------- |
+| `peopleCount` | `number` | required, integer,`2`–`20` |
 
 **Body DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `items` | `array` | required, `1`–`30` objects |
-| `items[].name` | `string` | required, trim, `2`–`50` characters |
-| `items[].price` | `number` | required, number, minimum `0` |
-| `items[].qty` | `number` | required, integer, minimum `1` |
-| `tipPercent` | `number` | optional, number, `0`–`30`, default `0` |
+| Field             | Type       | Rules                                         |
+| ----------------- | ---------- | --------------------------------------------- |
+| `items`         | `array`  | required,`1`–`30` objects                |
+| `items[].name`  | `string` | required, trim,`2`–`50` characters       |
+| `items[].price` | `number` | required, number, minimum`0`                |
+| `items[].qty`   | `number` | required, integer, minimum`1`               |
+| `tipPercent`    | `number` | optional, number,`0`–`30`, default `0` |
 
 **Example request**
 
@@ -323,24 +323,24 @@ Content-Type: application/json
 
 **What to learn:** the number lives in the path. The source and target units are query options. Reject the same-unit pair or an unknown unit.
 
-| | |
-| --- | --- |
-| Method | `GET` |
+|          |                                 |
+| -------- | ------------------------------- |
+| Method   | `GET`                         |
 | Endpoint | `/convert/temperature/:value` |
-| Input | **Params + Query** |
+| Input    | **Params + Query**        |
 
 **Params DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `value` | `number` | required, number, `-273.15`–`1000` |
+| Field     | Type       | Rules                                  |
+| --------- | ---------- | -------------------------------------- |
+| `value` | `number` | required, number,`-273.15`–`1000` |
 
 **Query DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `from` | `string` | required, one of `C`, `F`, `K` |
-| `to` | `string` | required, one of `C`, `F`, `K`, must be different from `from` |
+| Field    | Type       | Rules                                                                |
+| -------- | ---------- | -------------------------------------------------------------------- |
+| `from` | `string` | required, one of`C`, `F`, `K`                                  |
+| `to`   | `string` | required, one of`C`, `F`, `K`, must be different from `from` |
 
 **Example request**
 
@@ -371,27 +371,27 @@ Formulas: `C → F = C * 9/5 + 32`, `C → K = C + 273.15`. Convert through Cels
 
 **What to learn:** the cart is a body payload. Member status and coupon are optional flags in the query.
 
-| | |
-| --- | --- |
-| Method | `POST` |
+|          |                        |
+| -------- | ---------------------- |
+| Method   | `POST`               |
 | Endpoint | `/checkout/discount` |
-| Input | **Query + Body** |
+| Input    | **Query + Body** |
 
 **Query DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `member` | `boolean` | optional, default `false` |
-| `coupon` | `string` | optional, one of `HEMAT10`, `HEMAT20`, `FREESHIP` |
+| Field      | Type        | Rules                                                  |
+| ---------- | ----------- | ------------------------------------------------------ |
+| `member` | `boolean` | optional, default`false`                             |
+| `coupon` | `string`  | optional, one of`HEMAT10`, `HEMAT20`, `FREESHIP` |
 
 **Body DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `items` | `array` | required, `1`–`20` objects |
-| `items[].name` | `string` | required, `2`–`50` characters |
-| `items[].price` | `number` | required, number, minimum `0` |
-| `items[].qty` | `number` | required, integer, minimum `1` |
+| Field             | Type       | Rules                             |
+| ----------------- | ---------- | --------------------------------- |
+| `items`         | `array`  | required,`1`–`20` objects    |
+| `items[].name`  | `string` | required,`2`–`50` characters |
+| `items[].price` | `number` | required, number, minimum`0`    |
+| `items[].qty`   | `number` | required, integer, minimum`1`   |
 
 **Example request**
 
@@ -440,30 +440,30 @@ Suggested discount rules:
 
 **What to learn:** one endpoint can use all three sources. The principal is in the URL. Currency is a query option. Tenure and interest belong in the body.
 
-| | |
-| --- | --- |
-| Method | `POST` |
+|          |                                   |
+| -------- | --------------------------------- |
+| Method   | `POST`                          |
 | Endpoint | `/loans/:principal/installment` |
-| Input | **Params + Query + Body** |
+| Input    | **Params + Query + Body**   |
 
 **Params DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `principal` | `number` | required, number, `1_000_000`–`1_000_000_000` |
+| Field         | Type       | Rules                                             |
+| ------------- | ---------- | ------------------------------------------------- |
+| `principal` | `number` | required, number,`1_000_000`–`1_000_000_000` |
 
 **Query DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `currency` | `string` | optional, one of `IDR`, `USD`, default `IDR` |
+| Field        | Type       | Rules                                             |
+| ------------ | ---------- | ------------------------------------------------- |
+| `currency` | `string` | optional, one of`IDR`, `USD`, default `IDR` |
 
 **Body DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `months` | `number` | required, integer, `1`–`60` |
-| `annualInterestRate` | `number` | required, number, `0`–`50` |
+| Field                  | Type       | Rules                           |
+| ---------------------- | ---------- | ------------------------------- |
+| `months`             | `number` | required, integer,`1`–`60` |
+| `annualInterestRate` | `number` | required, number,`0`–`50`  |
 
 **Example request**
 
@@ -508,22 +508,22 @@ where `r = annualInterestRate / 12 / 100` and `n = months`. If `r === 0`, instal
 
 **What to learn:** nested objects need `@ValidateNested()` and `@Type()`. This is still body-only, but the validation is deeper.
 
-| | |
-| --- | --- |
-| Method | `POST` |
-| Endpoint | `/bills/electricity` |
-| Input | **Body only** (nested DTO) |
+|          |                                  |
+| -------- | -------------------------------- |
+| Method   | `POST`                         |
+| Endpoint | `/bills/electricity`           |
+| Input    | **Body only** (nested DTO) |
 
 **Body DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `customerName` | `string` | required, trim, `3`–`80` characters |
-| `meter.previousKwh` | `number` | required, number, minimum `0` |
-| `meter.currentKwh` | `number` | required, number, `> previousKwh` |
-| `rates.baseFee` | `number` | required, number, minimum `0` |
-| `rates.perKwh` | `number` | required, number, minimum `0` |
-| `rates.taxRate` | `number` | optional, number, `0`–`20`, default `11` |
+| Field                 | Type       | Rules                                          |
+| --------------------- | ---------- | ---------------------------------------------- |
+| `customerName`      | `string` | required, trim,`3`–`80` characters        |
+| `meter.previousKwh` | `number` | required, number, minimum`0`                 |
+| `meter.currentKwh`  | `number` | required, number,`> previousKwh`             |
+| `rates.baseFee`     | `number` | required, number, minimum`0`                 |
+| `rates.perKwh`      | `number` | required, number, minimum`0`                 |
+| `rates.taxRate`     | `number` | optional, number,`0`–`20`, default `11` |
 
 **Example request**
 
@@ -572,24 +572,24 @@ Content-Type: application/json
 
 **What to learn:** duration is the identity in the URL. Vehicle type and weekend flag change the rate through query.
 
-| | |
-| --- | --- |
-| Method | `GET` |
-| Endpoint | `/parking/:hours` |
-| Input | **Params + Query** |
+|          |                          |
+| -------- | ------------------------ |
+| Method   | `GET`                  |
+| Endpoint | `/parking/:hours`      |
+| Input    | **Params + Query** |
 
 **Params DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `hours` | `number` | required, number, `0.5`–`24` |
+| Field     | Type       | Rules                            |
+| --------- | ---------- | -------------------------------- |
+| `hours` | `number` | required, number,`0.5`–`24` |
 
 **Query DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `vehicle` | `string` | required, one of `car`, `motorcycle`, `bus` |
-| `weekend` | `boolean` | optional, default `false` |
+| Field       | Type        | Rules                                            |
+| ----------- | ----------- | ------------------------------------------------ |
+| `vehicle` | `string`  | required, one of`car`, `motorcycle`, `bus` |
+| `weekend` | `boolean` | optional, default`false`                       |
 
 **Example request**
 
@@ -627,33 +627,33 @@ Suggested rates (per hour): `motorcycle` = `2000`, `car` = `8000`, `bus` = `1500
 
 **What to learn:** destination city is in the path, delivery mode is a query flag, and package size is a nested body.
 
-| | |
-| --- | --- |
-| Method | `POST` |
-| Endpoint | `/shipping/:city` |
-| Input | **Params + Query + Body** |
+|          |                                 |
+| -------- | ------------------------------- |
+| Method   | `POST`                        |
+| Endpoint | `/shipping/:city`             |
+| Input    | **Params + Query + Body** |
 
 **Params DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `city` | `string` | required, one of `jakarta`, `bandung`, `surabaya`, `medan`, `denpasar` |
+| Field    | Type       | Rules                                                                           |
+| -------- | ---------- | ------------------------------------------------------------------------------- |
+| `city` | `string` | required, one of`jakarta`, `bandung`, `surabaya`, `medan`, `denpasar` |
 
 **Query DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `express` | `boolean` | optional, default `false` |
-| `insurance` | `boolean` | optional, default `false` |
+| Field         | Type        | Rules                      |
+| ------------- | ----------- | -------------------------- |
+| `express`   | `boolean` | optional, default`false` |
+| `insurance` | `boolean` | optional, default`false` |
 
 **Body DTO**
 
-| Field | Type | Rules |
-| --- | --- | --- |
-| `weightKg` | `number` | required, number, `0.1`–`30` |
-| `dimension.lengthCm` | `number` | required, number, `1`–`100` |
-| `dimension.widthCm` | `number` | required, number, `1`–`100` |
-| `dimension.heightCm` | `number` | required, number, `1`–`100` |
+| Field                  | Type       | Rules                            |
+| ---------------------- | ---------- | -------------------------------- |
+| `weightKg`           | `number` | required, number,`0.1`–`30` |
+| `dimension.lengthCm` | `number` | required, number,`1`–`100`  |
+| `dimension.widthCm`  | `number` | required, number,`1`–`100`  |
+| `dimension.heightCm` | `number` | required, number,`1`–`100`  |
 
 **Example request**
 
@@ -708,18 +708,18 @@ Suggested rules:
 
 Use this table to pick the right input source before writing code.
 
-| Case | Everyday problem | Endpoint | Params | Query | Body |
-| --- | --- | --- | --- | --- | --- |
-| 1 | Convert meters | `GET /convert/length/:meters` | yes | | |
-| 2 | Count tax / PPN | `GET /tax` | | yes | |
-| 3 | Average of scores | `POST /scores/average` | | | yes (array) |
-| 4 | Split a bill | `POST /bills/:peopleCount/split` | yes | | yes |
-| 5 | Convert temperature | `GET /convert/temperature/:value` | yes | yes | |
-| 6 | Checkout discount | `POST /checkout/discount` | | yes | yes |
-| 7 | Loan installment | `POST /loans/:principal/installment` | yes | yes | yes |
-| 8 | Electricity bill | `POST /bills/electricity` | | | yes (nested) |
-| 9 | Parking fee | `GET /parking/:hours` | yes | yes | |
-| 10 | Shipping cost | `POST /shipping/:city` | yes | yes | yes |
+| Case | Everyday problem    | Endpoint                               | Params | Query | Body         |
+| ---- | ------------------- | -------------------------------------- | ------ | ----- | ------------ |
+| 1    | Convert meters      | `GET /convert/length/:meters`        | yes    |       |              |
+| 2    | Count tax / PPN     | `GET /tax`                           |        | yes   |              |
+| 3    | Average of scores   | `POST /scores/average`               |        |       | yes (array)  |
+| 4    | Split a bill        | `POST /bills/:peopleCount/split`     | yes    |       | yes          |
+| 5    | Convert temperature | `GET /convert/temperature/:value`    | yes    | yes   |              |
+| 6    | Checkout discount   | `POST /checkout/discount`            |        | yes   | yes          |
+| 7    | Loan installment    | `POST /loans/:principal/installment` | yes    | yes   | yes          |
+| 8    | Electricity bill    | `POST /bills/electricity`            |        |       | yes (nested) |
+| 9    | Parking fee         | `GET /parking/:hours`                | yes    | yes   |              |
+| 10   | Shipping cost       | `POST /shipping/:city`               | yes    | yes   | yes          |
 
 ## Suggested implementation order
 
