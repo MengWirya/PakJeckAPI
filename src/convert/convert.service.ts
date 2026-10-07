@@ -11,7 +11,7 @@ export class ConvertService {
                 meters: dto.meters,
                 kilometers: dto.meters / 1000,
                 centimeters: dto.meters * 100,
-                miles: Math.floor(dto.meters * 1609)
+                miles: dto.meters / 1609
             }
         }
     }
